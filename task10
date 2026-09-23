@@ -1,0 +1,69 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+void matrixRotation(vector<vector<int>>& matrix, int r) {
+    int m = matrix.size();
+    int n = matrix[0].size();
+    
+    int numLayers = min(m, n) / 2;
+    
+    for (int layer = 0; layer < numLayers; layer++) {
+        vector<int> ring;
+        
+        // 1. Extract the current layer in anti-clockwise order:
+        // Top row (left to right)
+        for (int j = layer; j < n - layer; j++) {
+            ring.push_back(matrix[layer][j]);
+        }
+        // Right column (top + 1 to bottom - 1)
+        for (int i = layer + 1; i < m - layer - 1; i++) {
+            ring.push_back(matrix[i][n - 1 - layer]);
+        }
+        // Bottom row (right to left)
+        for (int j = n - 1 - layer; j >= layer; j--) {
+            ring.push_back(matrix[m - 1 - layer][j]);
+        }
+        // Left column (bottom - 1 to top + 1)
+        for (int i = m - 2 - layer; i > layer; i--) {
+            ring.push_back(matrix[i][layer]);
+        }
+        
+        // 2. Rotate the ring vector anti-clockwise by (r % len) positions
+        int len = ring.size();
+        int rot = r % len;
+        
+        // std::rotate shifts elements left by 'rot' positions
+        rotate(ring.begin(), ring.begin() + rot, ring.end());
+        
+        // 3. Place elements back into the matrix in the same traversal order
+        int idx = 0;
+        
+        // Top row
+        for (int j = layer; j < n - layer; j++) {
+            matrix[layer][j] = ring[idx++];
+        }
+        // Right column
+        for (int i = layer + 1; i < m - layer - 1; i++) {
+            matrix[i][n - 1 - layer] = ring[idx++];
+        }
+        // Bottom row
+        for (int j = n - 1 - layer; j >= layer; j--) {
+            matrix[m - 1 - layer][j] = ring[idx++];
+        }
+        // Left column
+        for (int i = m - 2 - layer; i > layer; i--) {
+            matrix[i][layer] = ring[idx++];
+        }
+    }
+    
+    // 4. Print the rotated matrix
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < n; j++) {
+            cout << matrix[i][j] << (j == n - 1 ? "" : " ");
+        }
+        cout << "\n";
+    }
+}
